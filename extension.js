@@ -18,6 +18,15 @@ const normalizeSelection = (editor) => {
         : Promise.resolve();
 }
 
+function insertJs(code = '', semicolon) {
+   insertText(`console.log('${code.replace(/'/g, '\\\'')}', ${code})${semicolon ? ';' : ''}`)
+}
+
+function insertRust(code) {
+    const element = code.replace(/[:,\.]/g, '').trim();
+    insertText(`println!("${element}: {:?}", ${element});`)
+}
+
 exports.activate = function (context) {
     const insertLogStatement = vscode.commands.registerCommand('extension.generateConsoleLog', () => {
         const editor = vscode.window.activeTextEditor;
@@ -26,10 +35,16 @@ exports.activate = function (context) {
             const { semicolon } = vscode.workspace.getConfiguration('console-log');
             const selection = editor.selection;
             const text = editor.document.getText(selection).trim();            
-            vscode.commands.executeCommand('editor.action.insertLineAfter').then(() => text
-                ? insertText(`console.log('${text.replace(/'/g, '\\\'')}', ${text})${semicolon ? ';' : ''}`)
-                : insertText(`console.log()${semicolon ? ';' : ''}`)              
-            )                
+            vscode.commands.executeCommand('editor.action.insertLineAfter').then(() => {
+                switch (editor.document.languageId) {
+                    case "javascript":
+                        insertJs(text, semicolon);
+                    break;
+                    case "rust":
+                        insertRust(text);
+                    break;
+                }
+            });
         });        
     });
     context.subscriptions.push(insertLogStatement);    
