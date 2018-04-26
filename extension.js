@@ -38,6 +38,7 @@ exports.activate = function (context) {
             vscode.commands.executeCommand('editor.action.insertLineAfter').then(() => {
                 switch (editor.document.languageId) {
                     case "javascript":
+                    case "javascriptreact":
                         insertJs(text, semicolon);
                     break;
                     case "rust":
