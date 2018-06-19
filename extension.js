@@ -39,6 +39,8 @@ exports.activate = function (context) {
                 switch (editor.document.languageId) {
                     case "javascript":
                     case "javascriptreact":
+                    case "typescript":
+                    case "typescriptreact":
                         insertJs(text, semicolon);
                     break;
                     case "rust":
